@@ -1,0 +1,14 @@
+# server
+listen_addr : "0.0.0.0"
+listen_port : 5005
+debug : True
+admin_server: "127.0.0.1"
+#
+## supervisor
+#supervisor_url : "http://admin:tschina@127.0.0.1:9001/RPC2"
+
+
+# log
+log_file: "/data/logs/tag.log"
+log_level: "DEBUG"
+log_format: "[%(levelname)s] [%(asctime)s] <%(name)s:%(lineno)d>:%(message)s"

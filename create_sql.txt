@@ -1,0 +1,14 @@
+CREATE TABLE tag (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	project VARCHAR(50) NOT NULL,
+	domain VARCHAR(50) NOT NULL,
+	tag VARCHAR(30) NOT NULL,
+	role VARCHAR(50) NOT NULL,
+	comment VARCHAR(100),
+	commit_time DATETIME,
+	commit_user VARCHAR(50),
+	config_url VARCHAR(300),
+	download_url VARCHAR(300),
+	is_ready VARCHAR(30),
+	CONSTRAINT p_r_t UNIQUE (project, role, tag)
+)

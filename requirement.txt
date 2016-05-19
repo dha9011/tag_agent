@@ -1,0 +1,9 @@
+PyYAML
+flask
+flask-restful
+setproctitle
+gunicorn
+gevent
+request
+Flask-HTTPAuth
+requests
