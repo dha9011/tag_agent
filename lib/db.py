@@ -3,70 +3,63 @@
 
 import MySQLdb
 from lib.logging import create_logger
+from app import cfg
+
 logger = create_logger(__name__)
+
+__all__ = ['connect', 'modify', 'get']
 
 class Mydb:
     def __init__(self):
-        self.username = 'root'
-        self.password = '5673914'
-        self.db = 'app_tag'
-        self.port = 3306
-        self.host = 'localhost'
-        self.charset = 'utf8'
-        self.conn = ''
-        self.times = 0
+        self._conn, self.cursor = None, None
+        self._connect()
 
-
-    def connect_db(self):
+    def _connect(self):
         try:
-            self.conn = MySQLdb.connect(host = self.host, user = self.username, passwd = self.password, db = self.db, port = self.port,
-                                        read_default_file = '/etc/my.cnf', charset = self.charset)
+            self._conn = MySQLdb.connect(host=cfg['mysql_host'], db=cfg['mysql_db'], user=cfg['mysql_user'],
+                                         passwd=cfg['mysql_pass'], port=cfg['mysql_port'], charset='utf8')
+
+            self.cursor = self._conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
         except Exception, e:
-            logger.error(e.args)
+            self.msg = 'Error when connect mysql: %s' % e.args
+            logger.error(self.msg)
 
     def connect(self):
-        if self.times > 5:
-            logger.warning('connect database failed')
-            self.times = 0
-            return
         try:
             if not self.conn.ping():
-                self.connect_db()
-        except:
-            self.times += 1
-            self.connect_db()
+                logger.debug('Reconnect mysql...')
+                self._connect()
+        except Exception:
+            logger.debug('Reconnect mysql...')
+            self._connect()
 
-    def modify(self, sql_str,params=None):
+    def get(self, sql):
         self.connect()
-        if sql_str != "":
-            try:
-                cur = self.conn.cursor()
-                cur.execute(sql_str, params)
-                self.conn.commit()
-                cur.close()
-                return {"status": "0", "message": "update data successfully"}
-            except Exception, e:
-                self.disconnect_db()
-                return {"status": "-10", "message": e.args}
-        else:
-            return {"status": "-1", "message": "no sql command"}
+        print sql
+        try:
+            self.cursor.execute(sql)
+            raw_records = self.cursor.fetchall()
+            return 0, list(raw_records)
+        except Exception, e:
+            logger.error(e.args)
+            return 1, []
+        finally:
+            self.cursor.close()
 
-    def get(self,sql_str):
+    def modify(self, sql):
         self.connect()
-        if sql_str != "":
-            try:
-                cur = self.conn.cursor()
-                cur.execute(sql_str)
-                records = cur.fetchall()
-                cur.close()
-                return {"status": "0", "message": list(records)}
-            except Exception,e:
-                return {"status": "-9", "message": e.args}
-        else:
-            return {"status": "-1", "message": "no sql command"}
+        try:
+            self.cursor.execute(sql)
+            c = self._conn.commit()
+            return 0, c
+        except Exception, e:
+            logger.error(e.args)
+            return 2, 'sql error'
+        finally:
+            self.cursor.close()
 
     def disconnect_db(self):
         if self.conn.ping():
             self.conn.close()
-            self.conn = ''
-            self.times = 0
+            self.conn = None

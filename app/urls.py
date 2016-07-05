@@ -9,8 +9,9 @@ import resource
 
 RESOURCES = [
     (resource.tag_submit, '/tag/submit'),
-    (resource.tag_list, '/tag/<string:project>/<string:domain>/<string:role>'),
-    (resource.tag_url, '/tag/<string:project>/<string:domain>/<string:role>/<string:tag>')
+    (resource.tag_list, '/tag/list/<string:project>/<string:domain>/<string:role>/<string:branch>'),
+    (resource.tag_url, '/tag/url/<string:project>/<string:domain>/<string:role>/<string:branch>/<string:tag>'),
+    (resource.branch_list, '/branch/<string:project>/<string:domain>/<string:role>')
 ]
 
 for res, uri in RESOURCES:

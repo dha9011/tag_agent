@@ -5,3 +5,4 @@
 __author__ = 'liming'
 
 from app_tag import tag_submit, tag_list, tag_url
+from app_branch import *

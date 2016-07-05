@@ -12,3 +12,9 @@ admin_server: "127.0.0.1"
 log_file: "/data/logs/tag.log"
 log_level: "DEBUG"
 log_format: "[%(levelname)s] [%(asctime)s] <%(name)s:%(lineno)d>:%(message)s"
+
+mysql_host: "127.0.0.1"
+mysql_port: 3306
+mysql_user: "root"
+mysql_pass: "5673914"
+mysql_db: "app_tag"
