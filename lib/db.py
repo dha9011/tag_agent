@@ -49,6 +49,7 @@ class Mydb:
 
     def modify(self, sql):
         self.connect()
+        print sql
         try:
             self.cursor.execute(sql)
             c = self._conn.commit()

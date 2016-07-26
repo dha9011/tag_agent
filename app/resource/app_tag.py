@@ -48,7 +48,7 @@ class tag_submit(restful.Resource):
                 Arg('commit_user', type=str, required=True, help='Miss commit_user'),
                 Arg('download_url', type=str, required=True, help='Miss download_url'),
                 Arg('config_url', type=str, required=True, help='Miss config_url'),
-                Arg('is_ready', type=str, required=True, help='Miss is_ready'),
+                Arg('is_ready', type=str, required=False, help='Miss is_ready', default="yes"),
                 Arg('branch', type=str, required=True, help='Miss is_ready'),
             ]
             args = get_parser(arguments).parse_args()
@@ -64,9 +64,9 @@ class tag_submit(restful.Resource):
             tag_is_ready = args['is_ready']
             tag_branch = args['branch']
             #判断此tag值是否已经存在
-            sql_str = 'SELECT tag FROM tag WHERE tag="%s" and project="%s" and role="%s"' % (
-                        tag_tag, tag_project, tag_role)
-            exist_tag = self.db.get(sql_str)["message"]
+            sql_str = 'SELECT tag FROM tag WHERE domain="%s" and tag="%s" and project="%s" and role="%s" and branch="%s"' % (
+                        tag_domain, tag_tag, tag_project, tag_role, tag_branch)
+            exist_tag, f = self.db.get(sql_str)
             if exist_tag:
                 raise Exception("this tag is exist")
             ISOTIMEFORMAT = '%Y-%m-%d %H:%M:%S'
@@ -77,7 +77,7 @@ class tag_submit(restful.Resource):
                 raise Exception(str(e))
             print tag_commit_time
             sql_str = 'INSERT INTO tag (tag, domain, project, role, comment, commit_time, commit_user, config_url, download_url, is_ready, branch) ' \
-                      'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);' % (
+                      'VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");' % (
                 tag_tag, tag_domain, tag_project, tag_role, tag_comment, tag_commit_time, tag_commit_user, tag_config_url, tag_download_url, tag_is_ready, tag_branch)
             s, f = self.db.modify(sql_str)
             if s:
