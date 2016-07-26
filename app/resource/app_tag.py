@@ -40,7 +40,7 @@ class tag_submit(restful.Resource):
         try:
             arguments = [
                 Arg('tag', type=str, required=True, help='Miss tag'),
-                Arg('domain', type=str, required=True, help='Miss domain'),
+                Arg('domain', type=str, required=False, help='Miss domain', default=""),
                 Arg('project', type=str, required=True, help='Miss project'),
                 Arg('role', type=str, required=True, help='Miss role'),
                 Arg('comment', type=str, required=True, help='Miss comment'),
@@ -48,7 +48,7 @@ class tag_submit(restful.Resource):
                 Arg('commit_user', type=str, required=True, help='Miss commit_user'),
                 Arg('download_url', type=str, required=True, help='Miss download_url'),
                 Arg('config_url', type=str, required=True, help='Miss config_url'),
-                Arg('is_ready', type=str, required=False, help='Miss is_ready', default="yes"),
+                Arg('is_ready', type=str, required=False, help='Miss is_ready', default=""),
                 Arg('branch', type=str, required=True, help='Miss is_ready'),
             ]
             args = get_parser(arguments).parse_args()
@@ -64,8 +64,8 @@ class tag_submit(restful.Resource):
             tag_is_ready = args['is_ready']
             tag_branch = args['branch']
             #判断此tag值是否已经存在
-            sql_str = 'SELECT tag FROM tag WHERE domain="%s" and tag="%s" and project="%s" and role="%s" and branch="%s"' % (
-                        tag_domain, tag_tag, tag_project, tag_role, tag_branch)
+            sql_str = 'SELECT tag FROM tag WHERE tag="%s" and project="%s" and role="%s" and branch="%s"' % (
+                        tag_tag, tag_project, tag_role, tag_branch)
             exist_tag, f = self.db.get(sql_str)
             if exist_tag:
                 raise Exception("this tag is exist")
@@ -83,7 +83,7 @@ class tag_submit(restful.Resource):
             if s:
                 logger.error(f)
                 raise Exception(str(f))
-            self.ret['message'] = f
+            self.ret['message'] = "OK"
             logger.info('insert a tag info: %s', self.ret["message"])
         except Exception, e:
             logger.error(str(e))
